@@ -4,12 +4,11 @@ import { useState } from "react"
 
 import Toggle from "~features/toggle"
 
-function IndexPopup() {
+export default function IndexPopup() {
   const [isEnabled, setIsEnabled] = useState<boolean>(false)
 
-  const handleEnabledClick = async () => {
+  async function handleEnabledClick() {
     const newState = !isEnabled
-    console.log("Toggle clicked, new state:", newState)
     setIsEnabled(newState)
 
     const tabs = await chrome.tabs.query({})
@@ -29,7 +28,6 @@ function IndexPopup() {
             },
             args: [newState]
           })
-          console.log("Sent new state to tab:", tab.id)
         } catch (error) {
           console.error("Error sending to tab:", tab.id, error)
         }
@@ -49,5 +47,3 @@ function IndexPopup() {
     </div>
   )
 }
-
-export default IndexPopup
