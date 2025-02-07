@@ -6,8 +6,6 @@ export const config: PlasmoCSConfig = {
 }
 
 function updateHighlights(isEnabled: boolean) {
-  console.log("Updating highlights:", isEnabled)
-
   document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
     const heading = el as HTMLElement
 
@@ -31,12 +29,10 @@ function updateHighlights(isEnabled: boolean) {
   })
 }
 
-// Ensure highlights start off
 updateHighlights(false)
 
 window.addEventListener("message", (event) => {
   if (event.data.type === "TOGGLE_HIGHLIGHTS") {
-    console.log("Received new state:", event.data.isEnabled)
     updateHighlights(event.data.isEnabled)
   }
 })
