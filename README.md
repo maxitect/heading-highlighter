@@ -66,6 +66,16 @@ This will generate a `build` folder. To install it in Chrome:
 3. Click **Load Unpacked**.
 4. Select the `chrome-mv3-prod` in your project's `build` folder.
 
+> [!WARNING]
+> FOR LINUX USERS
+> When running `pnpm dev` or `pnpm build` in a Linux environment you may come accross dumping errors or errors related to a package called `sharp`. You may see an error such as:
+>
+> ```sh
+>  ELIFECYCLE  Command failed with exit code 139.
+> ```
+>
+> These seem to be caused by the latest `plasmo` dependencies under its tailwind configuration. Although such an error may pop up, the project has > > built and you can load it into Chrome as described above.
+
 ---
 
 ## How It Works
