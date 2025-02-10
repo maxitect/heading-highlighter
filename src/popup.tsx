@@ -1,15 +1,31 @@
 import "~style.css"
-
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
 import Toggle from "~features/toggle"
+import { Storage } from "@plasmohq/storage"
+
+const storage = new Storage()
 
 export default function IndexPopup() {
-  const [isEnabled, setIsEnabled] = useState<boolean>(false)
+  const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const fetchStoredState = async () => {
+      const storedState = await storage.get<boolean>("isEnabled")
+      setIsEnabled(storedState ?? false)
+    }
+
+    fetchStoredState()
+  }, [])
 
   async function handleEnabledClick() {
+    if (isEnabled === null) return
+
     const newState = !isEnabled
     setIsEnabled(newState)
+
+    await storage.set("isEnabled", newState)
+
+    chrome.storage.sync.set({ isEnabled: newState })
 
     const tabs = await chrome.tabs.query({})
     tabs.forEach((tab) => {
@@ -34,6 +50,8 @@ export default function IndexPopup() {
       }
     })
   }
+
+  if (isEnabled === null) return null
 
   return (
     <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-h-64 plasmo-w-56 plasmo-flex-col plasmo-bg-slate-200">
