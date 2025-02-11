@@ -1,8 +1,8 @@
 {
-  "name": "heading-highlighter",
+  "name": "fac-ws_extensions_heading-highlighter",
   "displayName": "Heading highlighter",
   "version": "0.0.1",
-  "description": "A web accessibility browser tool that highlights headings to easily assess page hierarchy.",
+  "description": "FAC workshop for learning how to build browser extensions with Plasmo - web accessibility tool that highlights headings to easily assess page hierarchy.",
   "author": "maxitect",
   "scripts": {
     "dev": "plasmo dev",
