@@ -1,17 +1,21 @@
 import "~style.css"
-import { useEffect, useState } from "react"
-import Toggle from "~features/toggle"
-import { Storage } from "@plasmohq/storage"
 
-const storage = new Storage()
+import { useEffect, useState } from "react"
+
+import { sendToBackground } from "@plasmohq/messaging"
+
+import Toggle from "~features/toggle"
 
 export default function IndexPopup() {
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
 
   useEffect(() => {
     const fetchStoredState = async () => {
-      const storedState = await storage.get<boolean>("isEnabled")
-      setIsEnabled(storedState ?? false)
+      const response = await sendToBackground({
+        name: "toggleState",
+        body: { action: "get" }
+      })
+      setIsEnabled(response.isEnabled ?? false)
     }
 
     fetchStoredState()
@@ -23,9 +27,10 @@ export default function IndexPopup() {
     const newState = !isEnabled
     setIsEnabled(newState)
 
-    await storage.set("isEnabled", newState)
-
-    chrome.storage.sync.set({ isEnabled: newState })
+    await sendToBackground({
+      name: "toggleState",
+      body: { action: "set", isEnabled: newState }
+    })
 
     const tabs = await chrome.tabs.query({})
     tabs.forEach((tab) => {
