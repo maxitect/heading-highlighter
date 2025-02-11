@@ -1,3 +1,11 @@
+import type { PlasmoCSConfig } from "plasmo"
+
+import { sendToBackground } from "@plasmohq/messaging"
+
+export const config: PlasmoCSConfig = {
+  matches: ["<all_urls>"]
+}
+
 function updateHighlights(isEnabled: boolean) {
   document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
     const heading = el as HTMLElement
@@ -21,6 +29,15 @@ function updateHighlights(isEnabled: boolean) {
     }
   })
 }
+
+window.addEventListener("load", async () => {
+  const response = await sendToBackground({
+    name: "toggleState",
+    body: { action: "get" }
+  })
+  console.log(response)
+  updateHighlights(response.isEnabled ?? false)
+})
 
 window.addEventListener("message", (event) => {
   if (event.data.type === "TOGGLE_HIGHLIGHTS") {
