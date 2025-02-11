@@ -1,8 +1,9 @@
 import type { PlasmoCSConfig } from "plasmo"
 
+import { sendToBackground } from "@plasmohq/messaging"
+
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
-  world: "MAIN"
+  matches: ["<all_urls>"]
 }
 
 function updateHighlights(isEnabled: boolean) {
@@ -29,7 +30,14 @@ function updateHighlights(isEnabled: boolean) {
   })
 }
 
-updateHighlights(false)
+window.addEventListener("load", async () => {
+  const response = await sendToBackground({
+    name: "toggleState",
+    body: { action: "get" }
+  })
+  console.log(response)
+  updateHighlights(response.isEnabled ?? false)
+})
 
 window.addEventListener("message", (event) => {
   if (event.data.type === "TOGGLE_HIGHLIGHTS") {
