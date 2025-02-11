@@ -89,7 +89,7 @@ cd fac-ws_extensions_heading-highlighter
 Checkout the branch for this exercise by running:
 
 ```sh
-git checkout wo-storage
+git checkout exercise1
 ```
 
 ### **3. Install Dependencies**
