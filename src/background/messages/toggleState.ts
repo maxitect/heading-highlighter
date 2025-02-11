@@ -12,7 +12,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     isEnabled = req.body.isEnabled
     const tabs = await chrome.tabs.query({})
     tabs.forEach((tab) => {
-      if (tab.id) {
+      if (tab.id && tab.url && !/^chrome:|edge:/.test(tab.url)) {
         try {
           chrome.scripting.executeScript({
             target: { tabId: tab.id },
