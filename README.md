@@ -25,12 +25,12 @@ pnpm create plasmo --with-tailwindcss
 pnpm create plasmo
 ```
 
-2. Name the project `heading-highlighter` and run through the other setup configuration options.
+2. Name the project `heading-highlighter-1` and run through the other setup configuration options.
 
 3. Go into the project folder:
 
 ```sh
-cd heading-highlighter
+cd heading-highlighter-1
 ```
 
 4. Open in your favourite code editor (if configured):
@@ -80,8 +80,8 @@ If you want to run this solution to see what it should look like, follow these s
 In your work directory, run this command to clone the repo and go into the local repo folder:
 
 ```sh
-git clone https://github.com/maxitect/heading-highlighter.git
-cd heading-highlighter
+git clone https://github.com/TandemCreativeDev/fac-ws_extensions_heading-highlighter.git
+cd fac-ws_extensions_heading-highlighter
 ```
 
 ### **2. Change Branch**
