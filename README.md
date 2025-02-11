@@ -9,7 +9,7 @@ This is a simple Chrome extension built with **Plasmo** that allows users to tog
 - Toggle switch in the popup to enable/disable highlighting.
 - Applies a **blue background color** to all headings (`h1`-`h6`).
 - Uses **Plasmo content scripts** to modify the DOM dynamically.
-- No need for storage; instead, it uses **message passing** for real-time updates.
+- No need for storage; instead, it uses **message passing** for real-time updates and **background script** to store state in-memory.
 
 ---
 
@@ -80,22 +80,62 @@ This will generate a `build` folder. To install it in Chrome:
 
 ## How It Works
 
-### **Popup (`popup.tsx`)**
+### **State Management Diagram**
 
+```mermaid
+stateDiagram-v2
+    [*] --> Popup: User opens extension
+
+    state Popup {
+        [*] --> Idle: Awaiting user action
+        Idle --> Toggling: User toggles highlight
+        Toggling --> Idle: Toggle action complete
+    }
+
+    Popup --> Background: Request current state
+    Background --> Popup: Provide in-memory isEnabled state
+
+    Popup --> Background: Update isEnabled
+    Background --> Webpage: Inject isEnabled as message
+    Webpage --> Content: Listen for state changes by message
+
+    state Content {
+        [*] --> Waiting: Awaiting state
+        Waiting --> Highlighting: Apply highlights
+        Highlighting --> Waiting: Awaiting further changes
+    }
+
+    Content --> Background: Request current state on page load
+    Background --> Content: Provide in-memory isEnabled state
+    Content --> Webpage: Apply or remove highlights
+```
+
+### **Code File Explanations**
+
+#### **Toggle Switch (`features/toggle.tsx`)**
+
+- Implements a **Tailwind-styled** toggle switch **React** component.
+- Uses `peer` class-based styling for visual state changes.
+
+#### **Popup (`popup.tsx`)**
+
+- Implements a **Tailwind-styled** popup menu **React** component, rendering **toggle switch** interaction and current highlighting state state (ON or OFF).
 - Manages the toggle switch state (`isEnabled`).
-- Sends a message to **all open tabs** using `chrome.scripting.executeScript()`.
-- Uses `window.postMessage()` to send `TOGGLE_HIGHLIGHTS` to the content script.
+- Requests the current state from the **background script** using `sendToBackground()`.
+- Updates the state when toggled and sends the new value to the **background script**.
 
-### **Toggle Switch (`toggle.tsx`)**
+#### **Background Script (`background/messages/toggleState.ts`)**
 
-- Implements a Tailwind-styled toggle switch component.
-- Uses `peer` class-based styling for state management.
+- Stores the `isEnabled` state **in memory** (resets when the extension reloads).
+- Responds to state requests from the **popup** and **content script** via `sendToBackground()`.
+- Notifies all open tabs of state changes by **injecting `window.postMessage()`** via `chrome.scripting.executeScript()`.
 
-### **Content Script (`highlightHeadings.ts`)**
+#### **Content Script (`contents/highlightHeadings.ts`)**
 
-- Runs on all pages (`<all_urls>`).
-- Listens for `TOGGLE_HIGHLIGHTS` messages.
-- Dynamically updates heading background colors based on the toggle state.
+- Runs on **all webpages** (`<all_urls>`).
+- On **page load**, requests the current `isEnabled` state from the **background script**.
+- Listens for **`TOGGLE_HIGHLIGHTS`** messages via `window.postMessage()`.
+- Dynamically updates heading background colors based on the received state.
 
 ---
 
@@ -118,11 +158,9 @@ Add a **keyboard shortcut** (e.g., `Ctrl + Shift + H`) to toggle highlighting wi
 - Display a **notification or badge** when highlighting is enabled.
 - Show a **preview of the highlight effect** inside the popup.
 
-### **5️⃣ Refactoring & Code Optimization**
+### **5️⃣ State Storage**
 
-- Abstract message handling into a separate module.
-- Use TypeScript interfaces for better type safety.
-- Optimize the content script for better performance on large pages.
+Use plasmo storage API to store state in chrome storage and retrieve it persistently even after reloading the extension.
 
 ---
 
