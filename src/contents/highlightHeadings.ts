@@ -1,10 +1,4 @@
-import type { PlasmoCSConfig } from "plasmo"
-
 import { sendToBackground } from "@plasmohq/messaging"
-
-export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"]
-}
 
 function updateHighlights(isEnabled: boolean) {
   document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
@@ -35,7 +29,6 @@ window.addEventListener("load", async () => {
     name: "toggleState",
     body: { action: "get" }
   })
-  console.log(response)
   updateHighlights(response.isEnabled ?? false)
 })
 
