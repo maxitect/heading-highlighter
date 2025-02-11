@@ -1,38 +1,36 @@
 import "~style.css"
 
-import { useEffect, useState } from "react"
-
-import { sendToBackground } from "@plasmohq/messaging"
+import { useState } from "react"
 
 import Toggle from "~features/toggle"
+import getCurrentTabId from "~utils/getCurrentTabId"
 
 export default function IndexPopup() {
-  const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    async function fetchStoredState() {
-      const response = await sendToBackground({
-        name: "toggleState",
-        body: { action: "get" }
-      })
-      setIsEnabled(response.isEnabled ?? false)
-    }
-    fetchStoredState()
-  }, [])
+  const [isEnabled, setIsEnabled] = useState<boolean>(false)
 
   async function handleEnabledClick() {
-    if (isEnabled === null) return
-
     const newState = !isEnabled
     setIsEnabled(newState)
 
-    await sendToBackground({
-      name: "toggleState",
-      body: { action: "set", isEnabled: newState }
-    })
+    const tabId = await getCurrentTabId()
+    try {
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: (state) => {
+          window.postMessage(
+            {
+              type: "TOGGLE_HIGHLIGHTS",
+              isEnabled: state
+            },
+            "*"
+          )
+        },
+        args: [newState]
+      })
+    } catch (error) {
+      console.error("Error sending to tab:", tabId, error)
+    }
   }
-
-  if (isEnabled === null) return null
 
   return (
     <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-h-64 plasmo-w-56 plasmo-flex-col plasmo-bg-slate-200">
