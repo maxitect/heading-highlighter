@@ -1,10 +1,3 @@
-import type { PlasmoCSConfig } from "plasmo"
-
-export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
-  world: "MAIN"
-}
-
 function updateHighlights(isEnabled: boolean) {
   document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
     const heading = el as HTMLElement
@@ -28,8 +21,6 @@ function updateHighlights(isEnabled: boolean) {
     }
   })
 }
-
-updateHighlights(false)
 
 window.addEventListener("message", (event) => {
   if (event.data.type === "TOGGLE_HIGHLIGHTS") {
