@@ -10,14 +10,13 @@ export default function IndexPopup() {
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
 
   useEffect(() => {
-    const fetchStoredState = async () => {
+    async function fetchStoredState() {
       const response = await sendToBackground({
         name: "toggleState",
         body: { action: "get" }
       })
       setIsEnabled(response.isEnabled ?? false)
     }
-
     fetchStoredState()
   }, [])
 
@@ -30,29 +29,6 @@ export default function IndexPopup() {
     await sendToBackground({
       name: "toggleState",
       body: { action: "set", isEnabled: newState }
-    })
-
-    const tabs = await chrome.tabs.query({})
-    tabs.forEach((tab) => {
-      if (tab.id) {
-        try {
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: (state) => {
-              window.postMessage(
-                {
-                  type: "TOGGLE_HIGHLIGHTS",
-                  isEnabled: state
-                },
-                "*"
-              )
-            },
-            args: [newState]
-          })
-        } catch (error) {
-          console.error("Error sending to tab:", tab.id, error)
-        }
-      }
     })
   }
 
